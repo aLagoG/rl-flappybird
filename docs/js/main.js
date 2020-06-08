@@ -7,17 +7,17 @@ import {
     updateLearningRate,
     updateDiscount,
     updateLastDeath,
-} from "./renderHtml.js";
-import { Timer } from "./timer.js";
+} from './renderHtml.js';
+import { Timer } from './timer.js';
 
 const game_width = 400;
 const game_height = 490;
 
-Number.prototype.clamp = function(min, max) {
+Number.prototype.clamp = function (min, max) {
     return Math.min(Math.max(this, min), max);
 };
 
-let game = new Phaser.Game(game_width, game_height, Phaser.AUTO, "gameDiv");
+let game = new Phaser.Game(game_width, game_height, Phaser.AUTO, 'gameDiv');
 
 let learning_rate = 0.3;
 let discount = 0.5;
@@ -30,15 +30,15 @@ let epsilon = 0.1;
 let actions = [0, 1];
 
 // #region bitmap
-const tableCanvas = document.getElementById("tableCanvas"),
-    ctx = tableCanvas.getContext("2d"),
+const tableCanvas = document.getElementById('tableCanvas'),
+    ctx = tableCanvas.getContext('2d'),
     bitmap_width = 400,
     bitmap_height = 500,
     scaled_bitmap_width = Math.round(bitmap_width / scaling_factor),
     scaled_bitmap_height = Math.round(bitmap_height / scaling_factor);
 
-tableCanvas.setAttribute("width", bitmap_width);
-tableCanvas.setAttribute("height", bitmap_height);
+tableCanvas.setAttribute('width', bitmap_width);
+tableCanvas.setAttribute('height', bitmap_height);
 
 const bitmap_imagedata = Uint8ClampedArray.from(
     new Array(bitmap_width * bitmap_height * 4).fill(0),
@@ -113,7 +113,7 @@ function renderBitmap() {
 startTimes();
 
 let mainState = {
-    preload: function() {
+    preload: function () {
         if (!game.device.desktop) {
             game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
             game.scale.setMinMax(
@@ -127,13 +127,13 @@ let mainState = {
         game.scale.pageAlignHorizontally = true;
         game.scale.pageAlignVertically = true;
 
-        game.stage.backgroundColor = "#71c5cf";
+        game.stage.backgroundColor = '#71c5cf';
 
-        game.load.image("bird", "assets/bird.png");
-        game.load.image("pipe", "assets/pipe.png");
+        game.load.image('bird', 'assets/bird.png');
+        game.load.image('pipe', 'assets/pipe.png');
     },
 
-    create: function() {
+    create: function () {
         Timer.clear();
 
         updateLearningRate(learning_rate);
@@ -155,7 +155,7 @@ let mainState = {
         this.pipes = game.add.group();
         this.pipes_timer = Timer.add(90, this.addRowOfPipes, this);
 
-        this.bird = game.add.sprite(100, 250, "bird");
+        this.bird = game.add.sprite(100, 250, 'bird');
         game.physics.arcade.enable(this.bird);
         this.bird.body.gravity.y = 1000;
 
@@ -167,12 +167,12 @@ let mainState = {
         game.input.onDown.add(this.jump, this);
 
         this.score = 0;
-        this.labelScore = game.add.text(20, 20, "0", {
-            font: "30px Arial",
-            fill: "#ffffff",
+        this.labelScore = game.add.text(20, 20, '0', {
+            font: '30px Arial',
+            fill: '#ffffff',
         });
 
-        game.input.keyboard.addKey(Phaser.KeyCode.P).onDown.add(function() {
+        game.input.keyboard.addKey(Phaser.KeyCode.P).onDown.add(function () {
             game.paused = !game.paused;
         });
 
@@ -181,7 +181,7 @@ let mainState = {
         // change speed at runtime (ruins the timers)
         game.input.keyboard
             .addKey(Phaser.KeyCode.OPEN_BRACKET)
-            .onDown.add(function() {
+            .onDown.add(function () {
                 game.time.slowMotion *= 2;
                 updateSlowMotion(game.time.slowMotion);
                 game.time.desiredFps = 60 * game.time.slowMotion;
@@ -190,7 +190,7 @@ let mainState = {
 
         game.input.keyboard
             .addKey(Phaser.KeyCode.CLOSED_BRACKET)
-            .onDown.add(function() {
+            .onDown.add(function () {
                 game.time.slowMotion /= 2;
                 updateSlowMotion(game.time.slowMotion);
                 game.time.desiredFps = 60 * game.time.slowMotion;
@@ -202,7 +202,7 @@ let mainState = {
         this.addRowOfPipes();
     },
 
-    update: function() {
+    update: function () {
         if (this.bird.y < 0 || this.bird.y > game.world.height) {
             this.endGame();
             return;
@@ -217,23 +217,23 @@ let mainState = {
         );
     },
 
-    render: function() {
+    render: function () {
         if (!game.paused) {
             Timer.update();
             updateTimes(game.time.physicsElapsedMS);
         }
     },
 
-    jump: function() {
+    jump: function () {
         this.bird.body.velocity.y = -350;
     },
 
-    hitPipe: function() {
+    hitPipe: function () {
         this.endGame();
     },
 
-    addOnePipe: function(x, y) {
-        let pipe = game.add.sprite(x, y, "pipe");
+    addOnePipe: function (x, y) {
+        let pipe = game.add.sprite(x, y, 'pipe');
         this.pipes.add(pipe);
         game.physics.arcade.enable(pipe);
 
@@ -244,11 +244,11 @@ let mainState = {
         return pipe;
     },
 
-    addRowOfPipes: function() {
-        let hole = Math.floor(Math.random() * 3) + 2;
+    addRowOfPipes: function () {
+        let hole = Math.floor(Math.random() * 4) + 2;
 
         for (let i = 0; i < 8; i++) {
-            if (i != hole && i != hole + 1) {
+            if (Math.abs(i - hole) > 1) {
                 let pipe = this.addOnePipe(400, i * 60 + 10);
                 if (i == hole + 2) {
                     this.game_pipes.push(pipe);
@@ -260,7 +260,7 @@ let mainState = {
         this.labelScore.text = this.score;
     },
 
-    getMove: function() {
+    getMove: function () {
         // calculate real distances
         let [xDist, yDist] = this.getDxDy();
 
@@ -274,7 +274,7 @@ let mainState = {
 
         // update table
         this.updateTable(state, reward);
-        let keys = actions.map(a => `${state}|${a}`);
+        let keys = actions.map((a) => `${state}|${a}`);
         updateQTable(xDist, yDist, qa[keys[0]], qa[keys[1]]);
 
         let action = 0,
@@ -308,7 +308,7 @@ let mainState = {
         }
     },
 
-    updateTable: function(state, reward) {
+    updateTable: function (state, reward) {
         if (this.lastAction === undefined || this.lastState === undefined) {
             return;
         }
@@ -341,7 +341,7 @@ let mainState = {
             learning_rate * (reward + discount * valueA);
 
         // bitmap
-        const [dx, dy] = this.lastState.split("|").map(x => parseInt(x));
+        const [dx, dy] = this.lastState.split('|').map((x) => parseInt(x));
 
         const zero_based_deltax = scaled_bitmap_width - (dx + 1),
             zero_based_deltay = -dy + scaled_bitmap_height;
@@ -355,7 +355,7 @@ let mainState = {
         renderBitmap();
     },
 
-    getDxDy: function() {
+    getDxDy: function () {
         if (this.game_pipes.length == 0) {
             return [Infinity, Infinity];
         }
@@ -371,16 +371,16 @@ let mainState = {
         ];
     },
 
-    endGame: function() {
+    endGame: function () {
         Timer.clear();
         addScore(this.score);
         let [dx, dy] = this.getDxDy();
         let state = `${dx}|${dy}`;
         this.updateTable(state, -100);
         updateLastDeath();
-        game.state.start("main");
+        game.state.start('main');
     },
 };
 
-game.state.add("main", mainState);
-game.state.start("main");
+game.state.add('main', mainState);
+game.state.start('main');
