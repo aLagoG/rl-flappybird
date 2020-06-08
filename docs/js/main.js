@@ -245,7 +245,7 @@ let mainState = {
     },
 
     addRowOfPipes: function () {
-        let hole = Math.floor(Math.random() * 4) + 2;
+        let hole = Math.floor(Math.random() * 2) + 3;
 
         for (let i = 0; i < 8; i++) {
             if (Math.abs(i - hole) > 1) {
